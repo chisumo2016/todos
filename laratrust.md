@@ -6,10 +6,7 @@
     - User can broowsse to Todos -CRUD
     - We want the register user to be simple user, dont him to view the ToDoList Menu Item
 
-    NB: Same login/register page and redirect to ddifferent route
-        Admin and User 
-            /adminDashboard
-            /Userashboard
+   
         
 # INSTALLATIION
         composer require santigarcor/laratrust
@@ -42,3 +39,66 @@
             . $user->hasPermission('edit-user'); 
 
         I  can't see the Menu but i can visit the route
+                if (auth()->user()->hasPermission('todo.create'))
+                {
+                    $todos = Todo::where('user_id', auth()->id())->get();
+        
+                    return view('todos.index', compact('todos'));
+                }else{
+                    abort(404);
+                }
+
+# REDIRECT USERS AND ADMINS TO  DIFFERENT DASHBOARD  ROUTE   OR REDIRECT TO THE SAME 
+         NB: Same login/register page and redirect to ddifferent route
+        Admin and User 
+            /adminDashboard
+            /Userashboard
+
+
+        Logged in user redirect to /dashboard butt show them different views(content)
+        - By default every onne ttry to register will redirect to dashboard by default .
+                http://todos-app.test/dashboard 
+        - Comes from app/Providers/RouteServiceProvider.php
+        - If someone is authenticated app/Http/Controllers/Auth/AuthenticatedSessionController.php
+        - If the new user is registtered app/Http/Controllers/Auth/RegisteredUserController.php
+
+        - Some modifiication has to be done once the user is registerd or logged in
+                . open the user model
+                             public function getRedirectRoute()
+                            {
+                                if ($this->hasRole('admin')){
+                                    return 'adminDashboard';
+                                }elseif ($this->hasRole('todolistuser')){
+                                    return 'userdashboard';
+                                }
+                            }
+        - Open the  app/Http/Controllers/Auth/AuthenticatedSessionController.php
+            . in store method return redirect()->intended(Auth::user()->getRedirectRoute());
+        - Open the  app/Http/Controllers/Auth/RegisteredUserController.php
+            . in store method return return redirect(Auth::user()->getRedirectRoute());
+
+        - Make the route  for admin and user dashbaord
+                e.g
+                Route::get('/userdashboard', function () {
+                    return view('userdashboard');
+                })->middleware(['auth', 'verified'])->name('userdashboard');
+
+        - Make views for admin and user dashbaord
+                resources/views/admindashboard.blade.php
+                resources/views/userdashboard.blade.php
+
+        TEST OUR AAPPLUCATIOMN
+            .Register a new user
+              http://todos-app.test/userdashboard
+            .Log as admin 
+                http://todos-app.test/admindashboard
+
+        Make sure the addmin will see the admindashboard as user .The route wiill the same but different content
+            .Row back all the  Rou
+                return redirect()->intended(RouteServiceProvider::HOME);
+            .They will  see the different content
+                  Route::get('/dashboard', function () {
+                    return view('dashboard');
+                })->middleware(['auth', 'verified'])->name('dashboard');
+            .For  that will uuse DashboardController
+                     php artisan make:controller DashboardController
