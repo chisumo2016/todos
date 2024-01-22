@@ -12,7 +12,9 @@ class TodoController extends Controller
      */
     public function index()
     {
-        //
+        $todos = Todo::where('user_id', auth()->id())->get();
+
+        return view('todos.index', compact('todos'));
     }
 
     /**
@@ -20,7 +22,7 @@ class TodoController extends Controller
      */
     public function create()
     {
-        //
+        return view('todos.create');
     }
 
     /**
@@ -28,7 +30,9 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Todo::create(['user_id' => auth()->id()] + $request->all());
+
+        return redirect()->route('todos.index');
     }
 
     /**
@@ -36,7 +40,14 @@ class TodoController extends Controller
      */
     public function show(Todo $todo)
     {
-        //
+        if (auth()->id() == $todo->user_id){ //checking the current logged user is owner of the this todo item
+
+            return view('todos.show', compact('todo'));
+
+        }else{
+            return redirect()->route('todos.index')->withErrors(['msg' => 'You not allowed']);
+        }
+
     }
 
     /**
@@ -44,7 +55,13 @@ class TodoController extends Controller
      */
     public function edit(Todo $todo)
     {
-        //
+        if (auth()->id() == $todo->user_id){
+
+            return view('todos.edit', compact('todo'));
+
+        }else{
+            return view('todos.create');
+        }
     }
 
     /**
@@ -52,7 +69,13 @@ class TodoController extends Controller
      */
     public function update(Request $request, Todo $todo)
     {
-        //
+        if (auth()->id() == $todo->user_id){
+            $todo->update($request->all());
+            return redirect()->route('todos.index');
+
+        }else{
+            return redirect()->route('todos.index')->withErrors(['msg' => 'You not allowed']);
+        }
     }
 
     /**
@@ -60,6 +83,12 @@ class TodoController extends Controller
      */
     public function destroy(Todo $todo)
     {
-        //
+        if (auth()->id() == $todo->user_id){
+            $todo->delete();
+            return redirect()->route('todos.index');
+
+        }else{
+            return redirect()->route('todos.index')->withErrors(['msg' => 'You not allowed']);
+        }
     }
 }
