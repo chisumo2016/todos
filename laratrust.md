@@ -6,7 +6,10 @@
     - User can broowsse to Todos -CRUD
     - We want the register user to be simple user, dont him to view the ToDoList Menu Item
 
-   
+        ADMIN & USER 
+        redirect them tto different page
+                Login / Register  ---ADMIN 
+                                  ---USER
         
 # INSTALLATIION
         composer require santigarcor/laratrust
