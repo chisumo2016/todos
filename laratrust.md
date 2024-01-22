@@ -1,4 +1,5 @@
 # REDIRECT USERS AND ADMINS TO  DIFFERENT PAGE .
+    https://www.youtube.com/watch?v=NJMc7asJzms
     https://laratrust.santigarcor.me/
     - Using Laratrust
     - Register a new user
